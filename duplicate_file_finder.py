@@ -47,40 +47,47 @@ def percentBar(current,total,barLength=40):
     return "[%s%s] %1.4g%%" %(bar,spaces,percent) 
 
 
-def md5sum(filename): 
+def md5sum(filename,partial=False): 
     md5 = hashlib.md5()
-    BUFFER_SIZE = 15872 #prevents the program from using up too much memory
+    BUFFER_SIZE = 32768 #prevents the program from using up too much memory
     with open(filename, 'rb') as file: #open the target file in binary format
         buffer = file.read(BUFFER_SIZE) #loads a portion of the file into memory
         while len(buffer) > 0:
             md5.update(buffer) #add file data to the buffer
             buffer = file.read(BUFFER_SIZE)
+            if partial: #if True, hashes only the first 32kb
+                break
     return md5.hexdigest() #return the digested hash
 
 
-def hashDuplicates(): #finds duplicate files based on hash. Tries to find the original one
-    fileList = getFiles() 
+def hashDuplicates(fileList=[],partial=True): #finds duplicate files based on hash. Tries to find the original one
+    if partial:
+        fileList = getFiles()
     fileList.sort(reverse=True) #make sure anything with parenthesis gets put after the original file in order
     
-    print("\nHashing.... (this make take a while)")
     hashList = []
     for targetFile in fileList:
-        hashList.append(md5sum(targetFile))
+        hashList.append(md5sum(targetFile,partial))
         progressBar(fileList.index(targetFile)+1,len(fileList)) #experimental feature
 
     hashListDupes = collections.Counter(hashList)
 
     duplicates = {}
+    duplicatesList = []
 
     for key in hashListDupes: #getting the original file names
         if hashListDupes[key] > 1:
             itemIndex = hashList.index(key)
             duplicates[fileList[itemIndex]] = []
+            duplicatesList.append(fileList[itemIndex])
             hashList[itemIndex] = "" #removes the entry from the list
             for i in range(hashListDupes[key]-1):
                 itemIndex2 = hashList.index(key)
                 duplicates[fileList[itemIndex]].append(fileList[itemIndex2]) #adds duplicate file names to the dictionary entry
+                duplicatesList.append(fileList[itemIndex2])
                 hashList[itemIndex2] = "" 
+    if partial:
+        return hashDuplicates(duplicatesList,partial=False) #recursive function
     return duplicates #return dictionary
 
 
@@ -304,7 +311,7 @@ options = ["name","hash","test","help","quit"] #main menu options
 while(True):
     print("\n------------------------------------------MENU----------------------------------------------------")
     while(True):
-        if "remove name-dupes" and "remove hash-dupes" in options: #adds and remove the export item
+        if ("remove name-dupes" in options) and ("remove hash-dupes" in options): #adds and remove the export item
             if "export" not in options:
                 options.insert(6,"export")
         else:
@@ -348,6 +355,7 @@ while(True):
     #--------------------find duplicates by hash---------------------------
     elif user_input.lower() == "hash":
         print("\n=================================FINDING HASH DUPLICATES==========================================")
+        print("\nHashing.... ")
         hashdupes = hashDuplicates()
         count = 0
 
@@ -383,7 +391,8 @@ while(True):
         help(options)
 
     elif user_input.lower() == "export": #logs to a .txt file
-        with open(nameGenerator("list_of_duplicates.txt"),"w+") as file:
+        fileName = nameGenerator("list_of_duplicates.txt")
+        with (fileName,"w+") as file:
             file.write("Results from %s:\n" % os.getcwd())
             
             file.write("\nHash duplicates:\n")
@@ -403,3 +412,4 @@ while(True):
                     file.write("\n"+i)
                     count += 1
             file.write("\n\nTotal space wasted by"+ str(count) +"name duplicate files: "+ convertBytes(totalFileSize(namedupes)))
+            print("\nExported to:",fileName)
