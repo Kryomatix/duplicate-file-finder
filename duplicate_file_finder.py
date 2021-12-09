@@ -395,19 +395,19 @@ while(True):
         with open(fileName,"w+") as file:
             file.write("Results from %s:\n" % os.getcwd())
             
-            file.write("\nHash duplicates:\n")
+            file.write("\nHash duplicates:")
             count = 0
             for key in hashdupes: 
-                file.write("\n%s has %d exact hash duplicates:" % (key,len(hashdupes[key])))
+                file.write("\n\n%s has %d exact hash duplicates:" % (key,len(hashdupes[key])))
                 for i in hashdupes[key]:
                     file.write("\n"+i)
                     count += 1
             file.write("\n\nTotal space wasted by "+ str(count) +" hash duplicate files: "+ convertBytes(totalFileSize(hashdupes)))
 
-            file.write("\n\nName duplicates:\n")
+            file.write("\n\nName duplicates:")
             count = 0
             for key in namedupes:
-                file.write("\n%s is the most recent copy of:" % key)
+                file.write("\n\n%s is the most recent copy of:" % key)
                 for i in namedupes[key]:
                     file.write("\n"+i)
                     count += 1
