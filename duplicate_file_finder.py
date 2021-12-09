@@ -392,7 +392,7 @@ while(True):
 
     elif user_input.lower() == "export": #logs to a .txt file
         fileName = nameGenerator("list_of_duplicates.txt")
-        with (fileName,"w+") as file:
+        with open(fileName,"w+") as file:
             file.write("Results from %s:\n" % os.getcwd())
             
             file.write("\nHash duplicates:\n")
