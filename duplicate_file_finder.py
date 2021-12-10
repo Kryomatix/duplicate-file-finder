@@ -9,7 +9,7 @@ import math
 import shutil
 import time
 import re
-import send2trash #a safer alternative to os.remove()
+from send2trash import send2trash #a safer alternative to os.remove()
 
 
 def deleteFiles(list): #deletes entries in supplied list
@@ -165,6 +165,7 @@ def help(extra_options): #explains the available options
         print("remove name-dupes: removes duplicate items according to file name")
     if "remove hash-dupes" in extra_options:
         print("remove hash-dupes: removes duplicate items according to file hash")
+    print("change dir: changes the directory the program searches")
     print("test: creates duplicates in current directory of this file for testing purposes")
     print("quit: quits the program")
     if "export" in extra_options:
@@ -260,7 +261,7 @@ print("=========================================================================
 time.sleep(0.5)
 
 while True:
-    if "Downloads" not in os.getcwd(): #directory selection menu appears if you don't run in downloads
+    if not re.search("Downloads$",os.getcwd()): #directory selection menu appears if you don't run in downloads
         print("You appear to not be running in Downloads")
         print("1. Would you like to use the current directory:",os.getcwd()) #the current working directory
         downloads_path = os.path.expanduser('~')+"\\Downloads" #Fixed to be cross-compatible
@@ -307,7 +308,7 @@ print("Used:",percentBar(used,total))
 
 #------------------------options tree---------------------------------
 time.sleep(0.7)
-options = ["name","hash","test","help","quit"] #main menu options
+options = ["name","hash","test","help","change dir","quit"] #main menu options
 while(True):
     print("\n------------------------------------------MENU----------------------------------------------------")
     while(True):
@@ -413,3 +414,10 @@ while(True):
                     count += 1
             file.write("\n\nTotal space wasted by"+ str(count) +"name duplicate files: "+ convertBytes(totalFileSize(namedupes)))
             print("\nExported to:",fileName)
+    
+    elif user_input.lower() == "change dir": #change the working directory
+        path=input("Please input a custom path:\n") #custom path input
+        try:
+            os.chdir(path)
+        except:
+            print("Invalid directory")
