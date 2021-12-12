@@ -101,7 +101,7 @@ def nameDuplicates(): #find duplicates based on name and find the most recent on
     for i in files:
         filename, file_extension = os.path.splitext(i) #splits off the extension. Changed from using string.split() to deal with the dot in version numbers
         extensions.append(file_extension) #using os.path.splittext is easier than doing a regex match twice
-        baseNames.append(re.sub("(?i)\s*?((\s*?-\s*?Copy)?\s?(\(\d*\))?)*\s*?$","",filename)+file_extension) #gets rid of "- Copy" and version numbers - extension is added back on for searching
+        baseNames.append(re.sub("(?i)(\s*(-\s*Copy)?\s*(\(\d*\))?)*\s*$","",filename)+file_extension) #gets rid of "- Copy" and version numbers - extension is added back on for searching
 
     baseNameDupes = collections.Counter(baseNames) #count duplicates
     duplicates = {}
@@ -264,7 +264,10 @@ while True:
     if not re.search("Downloads$",os.getcwd()): #directory selection menu appears if you don't run in downloads
         print("You appear to not be running in Downloads")
         print("1. Would you like to use the current directory:",os.getcwd()) #the current working directory
-        downloads_path = os.path.expanduser('~')+"\\Downloads" #Fixed to be cross-compatible
+        if "\\" in os.path.expanduser("~"): #Fixed to be cross-compatible
+            downloads_path = os.path.expanduser('~')+"\\Downloads"
+        else:
+            downloads_path = os.path.expanduser('~')+"/Downloads" 
         print("2. Would you like to switch to %s" % downloads_path)
         print("3. Or would you like to switch to a custom directory")
         print("Options:",['1','2','3'])
