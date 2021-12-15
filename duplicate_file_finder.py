@@ -120,9 +120,8 @@ def nameDuplicates(): #find duplicates based on name and find the most recent on
 
 def totalFileSize(dict):
     totalsize = 0 
-    for key in dict: #iterates through the dictionary keys
-        for i in dict[key]:
-            totalsize += os.path.getsize(i) #adds up all the entries in the file name dictionary
+    for i in dict.values(): 
+        totalsize += os.path.getsize(i) #adds up all the entries in the file name dictionary
     return(totalsize)
 
 
@@ -182,10 +181,7 @@ def help2():
 
 
 def deleteMenu(dict): #input a dictionary, outputs a list
-    delete_list = [] #converts the dictionary to a list
-    for key in dict:
-        for i in dict[key]:
-            delete_list.append(i)
+    delete_list = dict.values()
     while True:
         print("\nDuplicate files that will be removed:")
         for i in delete_list:
@@ -239,10 +235,7 @@ def deleteMenu(dict): #input a dictionary, outputs a list
                     for i in delete_list:
                         print(i)
         elif selection.lower() == "refresh": #reloads the list and gets rid of any changes the user makes
-            delete_list = [] #converts the dictionary to a list
-            for key in dict:
-                for i in dict[key]:
-                    delete_list.append(i)
+            delete_list = dict.values()
         elif selection.lower() == "help": #help menu nuber 2
             help2()
         else:
